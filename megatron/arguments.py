@@ -631,6 +631,8 @@ def _add_mixed_precision_args(parser):
     group.add_argument('--fp16-lm-cross-entropy', action='store_true',
                        help='Move the cross entropy unreduced loss calculation'
                        'for lm head to fp16.')
+    group.add_argument('--no-kernel-inject', action='store_true',
+                       help='Run model in fp16 mode.')
 
     return parser
 

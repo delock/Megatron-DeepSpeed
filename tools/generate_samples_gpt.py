@@ -156,8 +156,8 @@ def ds_inference(model, args):
     engine = deepspeed.init_inference(model=model,
                                       mp_size=args.tensor_model_parallel_size,
                                       tensor_parallel={"mpu": mpu},
-                                      dtype=torch.half,
-                                      replace_with_kernel_inject=True,
+                                      dtype=(torch.half if args.fp16==True else torch.bfloat16),
+                                      replace_with_kernel_inject=not args.no_kernel_inject,
                                       moe_experts=args.num_experts,
                                       moe_type=args.mlp_type)
 

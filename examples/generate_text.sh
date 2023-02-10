@@ -10,6 +10,14 @@ nodes=1
 gpus=1
 
 
+data_type="fp16"
+#data_type="bf16"
+
+
+kernel_inject=""
+#kernel_inject="--no-kernel-inject"
+
+
 use_tutel=""
 #use_tutel="--use-tutel"
 
@@ -29,7 +37,7 @@ program_cmd="tools/generate_samples_gpt.py \
        --num-attention-heads $A \
        --max-position-embeddings 1024 \
        --tokenizer-type GPT2BPETokenizer \
-       --fp16 \
+       --${data_type} \
        --num-experts ${experts} \
        --mlp-type standard \
        --micro-batch-size $b \
@@ -43,7 +51,7 @@ program_cmd="tools/generate_samples_gpt.py \
        --log-interval 1 \
        --num-samples 0 \
        --load $CHECKPOINT_PATH \
-       $use_tutel $ds_inference"
+       $kernel_inject $use_tutel $ds_inference"
 
 echo $launch_cmd $program_cmd
 $launch_cmd $program_cmd
