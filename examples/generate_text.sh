@@ -10,12 +10,12 @@ nodes=1
 gpus=1
 
 
-data_type="fp16"
-#data_type="bf16"
+#data_type="fp16"
+data_type="bf16"
 
 
-kernel_inject=""
-#kernel_inject="--no-kernel-inject"
+#kernel_inject=""
+kernel_inject="--no-kernel-inject"
 
 
 use_tutel=""
