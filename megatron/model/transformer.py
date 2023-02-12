@@ -785,12 +785,15 @@ class ParallelTransformer(MegatronModule):
                                       enc_dec_attn_mask=enc_dec_attn_mask,
                                       layer_past=past,
                                       get_key_value=get_key_value)
+                # TODO gma the return value of layer is not a pytorch tensor, check why
                 if not self.ds_inference:
                     hidden_states, moe_loss = hidden_states
                     moe_losses.append(moe_loss)
                 if get_key_value:
                     hidden_states, present = hidden_states
                     presents.append(present)
+                if not torch.is_tensor(hidden_states):
+                    hidden_states = hidden_states[0]
 
         # Final layer norm.
         if self.post_process:
