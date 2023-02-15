@@ -246,11 +246,13 @@ class ParallelAttention(MegatronModule):
 
         if layer_past is not None:
             past_key, past_value = layer_past
-            key_layer = torch.cat((past_key.type_as(key_layer),
-                                   key_layer), dim=0)
-            value_layer = torch.cat((past_value.type_as(value_layer),
-                                     value_layer), dim=0)
-        if get_key_value:
+            key_layer_new = torch.cat((past_key.type_as(key_layer),
+                                   key_layer), dim=1)
+            value_layer_new = torch.cat((past_value.type_as(value_layer),
+                                     value_layer), dim=1)
+        if get_key_value and layer_past is not None:
+            present = (key_layer_new, value_layer_new)
+        else:
             present = (key_layer, value_layer)
 
         # ===================================
