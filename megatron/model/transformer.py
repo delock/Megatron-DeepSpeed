@@ -287,6 +287,30 @@ class ParallelAttention(MegatronModule):
             key_layer.transpose(0, 1).transpose(1, 2),  # [b * np, hn, sk]
             beta=0.0, alpha=(1.0/self.norm_factor))
 
+        # TODO temporal method to get around a bug in torch.baddbmm implementation
+        if torch.isnan(matmul_result.sum()):
+            # temporary fix up for nan values in torch.baddbmm
+            #print ("nan value discovered in result, fallback")
+            qtrans = query_layer.transpose(0, 1)
+            ktrans = key_layer.transpose(0, 1).transpose(1, 2)
+            for index in range(matmul_result.size()[0]):
+                matmul_result[index] = torch.mm(qtrans[index], ktrans[index])*(1.0/self.norm_factor)
+        """
+        else:
+            # verify correctness of this algorithm
+            matmul_result2 = torch.empty(
+                output_size[0]*output_size[1],
+                output_size[2],
+                output_size[3],
+                dtype=query_layer.dtype,
+                device=get_accelerator().current_device_name())
+            qtrans = query_layer.transpose(0, 1)
+            ktrans = key_layer.transpose(0, 1).transpose(1, 2)
+            for index in range(matmul_result.size()[0]):
+                matmul_result2[index] = torch.mm(qtrans[index], ktrans[index])*(1.0/self.norm_factor)
+            print("verify matmul_result: {}".format( ((matmul_result-matmul_result2)*(matmul_result-matmul_result2)).sum()))
+        """
+
         # change view to [b, np, sq, sk]
         attention_scores = matmul_result.view(*output_size)
 
